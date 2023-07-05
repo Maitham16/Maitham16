@@ -1,5 +1,5 @@
 - 👋 Hi, I’m @Maitham Alrubaye
 - 👀 I have BSc in computer engineering and currently I do MSc in computer science. 
-- 🌱 This project based on one of my master's classes.
+- 🌱 My projects in public repositories mostly based on my favorite master's classes.
 - 💞️ Programming for me is a girlfriend :D
 - 📫 How to reach me maythem.altamar@gmail.com
