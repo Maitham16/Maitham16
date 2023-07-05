@@ -2,4 +2,5 @@
 - 👀 I have BSc in computer engineering and currently I do MSc in computer science. 
 - 🌱 This project Ray Tracing Using C++ based on one of my favorite master's classes.
 - 💞️ Programming for me is a girlfriend :D
+- 🌱 Copilot my best co.
 - 📫 How to reach me maythem.altamar@gmail.com
