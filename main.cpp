@@ -4,27 +4,41 @@
 
 #include "Classes/stdtemplate.h"
 #include "Classes/Vec3.h"
-#include "Classes/Ray.h"
+#include "Classes/Hitable_list.h"
 #include "Classes/Camera.h"
 #include "Classes/Sphere.h"
+#include "Classes/Material.h"
 
 // return background color
-Vec3 color(const Ray &ray, const Sphere &sphere)
+Vec3 color(const Ray &ray, Hitable *World, int depth)
 {
-    if (sphere.hit_sphere(sphere.center, sphere.radius, ray))
+    Hit_record hit_record;
+    if (World->intersect(ray, 0.001, MAXFLOAT, hit_record))
     {
-        return Vec3(1.0, 1.0, 0.0);
+        Ray scattered;
+        Vec3 attenuation;
+        if (depth < 50 && hit_record.material->scatter(ray, hit_record, attenuation, scattered))
+        {
+            return attenuation * color(scattered, World, depth + 1);
+        }
+        else
+        {
+            return Vec3(0.0, 0.0, 0.0);
+        }
     }
-    Vec3 unit_direction = unit_vector(ray.direction());
-    float t = 0.5 * (unit_direction.y() + 1.0);
-
-    return Vec3(1.0, 1.0, 1.0) * (1.0 - t) + Vec3(0.4, 0.5, 1.0) * t;
+    else
+    {
+        Vec3 unit_direction = unit_vector(ray.direction());
+        float t = 0.5 * (unit_direction.y() + 1.0);
+        return (1.0 - t) * Vec3(1.0, 1.0, 1.0) + t * Vec3(0.4, 0.5, 1.0);
+    }
 }
 
 int main()
 {
-    int width = 800;
-    int height = 400;
+    int width = 2048;
+    int height = 1024;
+    int ns = 100;
     std::ofstream ofs;
     ofs.open("./output.ppm");
     std::cout << "P3\n"
@@ -33,7 +47,7 @@ int main()
     sdltemplate::loop();
     ofs << "P3\n"
         << width << " " << height << "\n255\n";
-    
+
     // scene
     Camera camera;
     camera.left = Vec3(-2.0, -1.0, -1.0);
@@ -41,21 +55,30 @@ int main()
     camera.vertical = Vec3(0.0, 2.0, 0.0);
     camera.position = Vec3(0.0, 0.0, 0.0);
 
-    Sphere sphere;
-    sphere.center = Vec3(0.0, 0.0, -1.0);
-    sphere.radius = 0.5;
-    
+    Hitable *list[4];
+    list[0] = new Sphere(Vec3(0.0, 0.0, -1.0), 0.5, new Lambertian(Vec3(0.8, 0.3, 0.3))); // sphere 1
+    list[1] = new Sphere(Vec3(0.0, -100.5, -1.0), 100.0, new Lambertian(Vec3(0.8, 0.8, 0.0))); // ground
+    list[2] = new Sphere(Vec3(1.0, 0.0, -1.0), 0.5, new Metal(Vec3(0.8, 0.6, 0.2), 0.3)); // sphere 2
+    list[3] = new Sphere(Vec3(-1.0, 0.0, -1.0), 0.5, new Metal(Vec3(0.8, 0.8, 0.8), 1.0)); // sphere 3
+    Hitable *world = new Hitable_list(list, 4);
+
     for (int j = height - 1; j >= 0; j--)
     {
         for (int i = 0; i < width; i++)
         {
-            float u = float(i) / float(width);
-            float v = float(j) / float(height);
-            Ray ray = camera.get_ray(u, v);
-            Vec3 bgColor = color(ray, sphere);
-            int ir = int(255.99 * bgColor[0]);
-            int ig = int(255.99 * bgColor[1]);
-            int ib = int(255.99 * bgColor[2]);
+            Vec3 sceneColor(0.0, 0.0, 0.0);
+            for (int s = 0; s < ns; s++)
+            {
+                float u = float(i + drand48()) / float(width);
+                float v = float(j + drand48()) / float(height);
+                Ray ray = camera.get_ray(u, v);
+                sceneColor += color(ray, world, 0);
+            }
+            sceneColor /= float(ns);
+            sceneColor = Vec3(sqrt(sceneColor.r()), sqrt(sceneColor.g()), sqrt(sceneColor.b()));
+            int ir = int(255.99 * sceneColor[0]);
+            int ig = int(255.99 * sceneColor[1]);
+            int ib = int(255.99 * sceneColor[2]);
             std::cout << ir << " " << ig << " " << ib << "\n";
             ofs << ir << " " << ig << " " << ib << "\n";
             sdltemplate::setDrawColor(sdltemplate::createColor(ir, ig, ib, 255));

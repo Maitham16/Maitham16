@@ -1,4 +1,4 @@
-// Vector3 class header (according to the book Ray Tracing in One Weekend)
+// Vector3 header class (according to the book Ray Tracing in One Weekend)
 #ifndef VEC3_H
 #define VEC3_H
 
@@ -179,6 +179,22 @@ inline Vec3& Vec3::operator/=(const float t)
 inline Vec3 unit_vector(Vec3 v)
 {
     return v / v.length();
+}
+
+inline Vec3 random_in_unit_sphere()
+{
+    Vec3 p;
+    do
+    {
+        p = 2.0 * Vec3(drand48(), drand48(), drand48()) - Vec3(1, 1, 1);
+    } while (p.squared_length() >= 1.0);
+
+    return p;
+}
+
+inline Vec3 reflect(const Vec3& v, const Vec3& n)
+{
+    return v - 2 * dot(v, n) * n;
 }
 
 #endif

@@ -4,25 +4,54 @@
 
 #include "Vec3.h"
 #include "Ray.h"
+#include "Hitable.h"
+#include "Material.h"
 
-class Sphere
+class Sphere : public Hitable
 {
 public:
-    Sphere() {}
-    Sphere(Vec3 center, float redius) : center(center), radius(redius) {}
-
     Vec3 center;
     float radius;
+    Material *material;
 
-    bool hit_sphere(const Vec3 center, float radius, const Ray &ray) const
+    Sphere() {}
+    Sphere(Vec3 center, float radius, Material *material) : center(center), radius(radius), material(material) {}
+
+    virtual bool intersect(const Ray &ray, float t_min, float t_max, Hit_record &hit_record) const;
+};
+
+bool Sphere::intersect(const Ray &ray, float t_min, float t_max, Hit_record &hit_record) const
+{
+    Vec3 oc = ray.origin() - center;
+    float a = dot(ray.direction(), ray.direction());
+    float b = dot(oc, ray.direction());
+    float c = dot(oc, oc) - radius * radius;
+    float discriminant = b * b - a * c;
+
+    if (discriminant > 0.0)
     {
-        Vec3 oc = ray.origin() - center;
-        float a = dot(ray.direction(), ray.direction());
-        float b = 2.0 * dot(oc, ray.direction());
-        float c = dot(oc, oc) - radius * radius;
-        float discriminant = b * b - 4 * a * c;
-        return (discriminant > 0);
+        float temp = (-b - sqrt(b * b - a * c)) / a;
+        if (temp < t_max && temp > t_min)
+        {
+            hit_record.t = temp;
+            hit_record.p = ray.point_at(hit_record.t);
+            hit_record.normal = (hit_record.p - center) / radius;
+            hit_record.material = material;
+            return true;
+        }
+
+        temp = (-b + sqrt(b * b - a * c)) / a;
+        if (temp < t_max && temp > t_min)
+        {
+            hit_record.t = temp;
+            hit_record.p = ray.point_at(hit_record.t);
+            hit_record.normal = (hit_record.p - center) / radius;
+            hit_record.material = material;
+            return true;
+        }
     }
+
+    return false;
 };
 
 #endif
