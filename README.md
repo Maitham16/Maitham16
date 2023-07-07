@@ -1,6 +1,8 @@
-- 👋 Hi, I’m @Maitham Alrubaye
-- 👀 I have BSc in computer engineering and currently I do MSc in computer science. 
-- 🌱 This project Ray Tracing Using C++ based on one of my favorite master's classes.
-- 💞️ Programming for me is a girlfriend :D
-- 🌱 Copilot my best co.
-- 📫 How to reach me maythem.altamar@gmail.com
+- 🖐️ Hi, I’m Maitham Alrubaye.
+- 🎓 I hold a BSc in Computer Engineering and am currently pursuing an MSc in Computer Science.
+- 💡 I undertook a project on Ray Tracing Using C++, inspired by one of my favorite master's classes and a book titled "Ray Tracing in One Weekend".
+- 💖 For me, programming is as compelling as a love interest.
+- 🚀 Copilot is my trusted sidekick in coding.
+- 📝 The references mentioned in the comments are either from the aforementioned book or from the YouTube channel, Avery Makes Games.
+- 🙏 I greatly appreciate the efforts of my professors: Mr. Manfred Klaffenböck, Mr. Torsten Möller, and Mr. Julian Schneebaur.
+- 💌 You can reach me at maythem.altamar@gmail.com

@@ -30,8 +30,8 @@ public:
     inline Vec3 &operator*=(const float t);
     inline Vec3 &operator/=(const float t);
 
-    inline float length() const{ return sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2]);}
-    inline float squared_length() const { return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];}
+    inline float length() const { return sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2]); }
+    inline float squared_length() const { return e[0] * e[0] + e[1] * e[1] + e[2] * e[2]; }
     inline void make_unit_vector();
 
     float e[3];
@@ -156,7 +156,7 @@ inline Vec3 &Vec3::operator/=(const Vec3 &v)
     return *this;
 }
 
-inline Vec3& Vec3::operator*=(const float t)
+inline Vec3 &Vec3::operator*=(const float t)
 {
     e[0] *= t;
     e[1] *= t;
@@ -165,7 +165,7 @@ inline Vec3& Vec3::operator*=(const float t)
     return *this;
 }
 
-inline Vec3& Vec3::operator/=(const float t)
+inline Vec3 &Vec3::operator/=(const float t)
 {
     float k = 1.0 / t;
 
@@ -192,9 +192,37 @@ inline Vec3 random_in_unit_sphere()
     return p;
 }
 
-inline Vec3 reflect(const Vec3& v, const Vec3& n)
+inline Vec3 reflect(const Vec3 &v, const Vec3 &n)
 {
     return v - 2 * dot(v, n) * n;
 }
 
+inline bool refract(const Vec3 &v, const Vec3 &n, float ni_over_nt, Vec3 &refracted)
+{
+    Vec3 uv = unit_vector(v);
+    float dt = dot(uv, n);
+    float discriminant = 1.0 - ni_over_nt * ni_over_nt * (1 - dt * dt);
+
+    if (discriminant > 0)
+    {
+        refracted = ni_over_nt * (uv - n * dt) - n * sqrt(discriminant);
+
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+inline Vec3 random_in_unit_disk()
+{
+    Vec3 p;
+    do
+    {
+        p = 2.0 * Vec3(drand48(), drand48(), 0.0) - Vec3(1, 1, 0);
+    } while (dot(p, p) >= 1.0);
+
+    return p;
+}
 #endif

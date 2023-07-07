@@ -49,18 +49,32 @@ int main()
         << width << " " << height << "\n255\n";
 
     // scene
-    Camera camera;
-    camera.left = Vec3(-2.0, -1.0, -1.0);
-    camera.horizontal = Vec3(4.0, 0.0, 0.0);
-    camera.vertical = Vec3(0.0, 2.0, 0.0);
-    camera.position = Vec3(0.0, 0.0, 0.0);
+    Vec3 left = Vec3(-2.0, -1.0, -1.0);
+    Vec3 horizontal = Vec3(4.0, 0.0, 0.0);
+    Vec3 vertical = Vec3(0.0, 2.0, 0.0);
+    Vec3 position = Vec3(0.0, 0.0, 0.0);
+    float fov = 20.0;
+    float aspect = float(width) / float(height);
+    Vec3 look_from = Vec3(3.0, 3.0, 2.0);
+    Vec3 look_at = Vec3(0.0, 0.0, -1.0);
+    Vec3 up = Vec3(0.0, 1.0, 0.0);
+    float focus = (look_from - look_at).length();
+    float aperture = 2.0;
+    Camera camera(look_from, look_at, up, fov, aspect, aperture, focus);
 
-    Hitable *list[4];
-    list[0] = new Sphere(Vec3(0.0, 0.0, -1.0), 0.5, new Lambertian(Vec3(0.8, 0.3, 0.3))); // sphere 1
+    Hitable *list[5];
+    list[0] = new Sphere(Vec3(0.0, 0.0, -1.0), 0.5, new Lambertian(Vec3(0.1, 0.2, 0.5)));      // sphere 1
     list[1] = new Sphere(Vec3(0.0, -100.5, -1.0), 100.0, new Lambertian(Vec3(0.8, 0.8, 0.0))); // ground
-    list[2] = new Sphere(Vec3(1.0, 0.0, -1.0), 0.5, new Metal(Vec3(0.8, 0.6, 0.2), 0.3)); // sphere 2
-    list[3] = new Sphere(Vec3(-1.0, 0.0, -1.0), 0.5, new Metal(Vec3(0.8, 0.8, 0.8), 1.0)); // sphere 3
-    Hitable *world = new Hitable_list(list, 4);
+    list[2] = new Sphere(Vec3(1.0, 0.0, -1.0), 0.5, new Metal(Vec3(0.8, 0.6, 0.2), 0.3));      // sphere 2
+    list[3] = new Sphere(Vec3(-1.0, 0.0, -1.0), 0.5, new dialectric(1.5));                     // sphere 3
+    list[4] = new Sphere(Vec3(-1.0, 0.0, -1.0), -0.45, new dialectric(1.5));                   // sphere 3
+
+    // Hitable *list[2];
+    // float R = cos(M_PI / 4);
+    // list[0] = new Sphere(Vec3(-R, 0.0, -1.0), R, new Lambertian(Vec3(0.0, 0.0, 1.0))); // sphere 1
+    // list[1] = new Sphere(Vec3(R, 0.0, -1.0), R, new Lambertian(Vec3(1.0, 0.0, 0.0))); // sphere 2
+
+    Hitable *world = new Hitable_list(list, 5);
 
     for (int j = height - 1; j >= 0; j--)
     {
