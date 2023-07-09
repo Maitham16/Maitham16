@@ -3,6 +3,7 @@
 #define MOVING_SPHERE_H
 
 #include "Hitable.h"
+#include "AABB.h"
 
 class Moving_sphere : public Hitable
 {
@@ -18,6 +19,8 @@ public:
     // override the pure virtual function in Hitable class
     virtual bool intersect(const Ray &ray, float t_min, float t_max, Hit_record &hit_record) const;
     Vec3 center(double time) const;
+
+    virtual bool bounding_box(float tm0, float tm1, AABB &box) const;
 };
 
 Vec3 Moving_sphere::center(double time) const
@@ -54,6 +57,14 @@ bool Moving_sphere::intersect(const Ray &ray, float t_min, float t_max, Hit_reco
         }
     }
     return false;
-}
+};
+
+bool Moving_sphere::bounding_box(float tm0, float tm1, AABB &box) const
+{
+    AABB box0(center(tm0) - Vec3(radius, radius, radius), center(tm0) + Vec3(radius, radius, radius));
+    AABB box1(center(tm1) - Vec3(radius, radius, radius), center(tm1) + Vec3(radius, radius, radius));
+    box = surrounding_box(box0, box1);
+    return true;
+};
 
 #endif

@@ -18,6 +18,7 @@ public:
     Sphere(Vec3 center, float radius, Material *material) : center(center), radius(radius), material(material) {}
 
     virtual bool intersect(const Ray &ray, float t_min, float t_max, Hit_record &hit_record) const;
+    virtual bool bounding_box(float tm0, float tm1, AABB &box) const;
 };
 
 bool Sphere::intersect(const Ray &ray, float t_min, float t_max, Hit_record &hit_record) const
@@ -52,6 +53,12 @@ bool Sphere::intersect(const Ray &ray, float t_min, float t_max, Hit_record &hit
     }
 
     return false;
+};
+
+bool Sphere::bounding_box(float tm0, float tm1, AABB &box) const
+{
+    box = AABB(center - Vec3(radius, radius, radius), center + Vec3(radius, radius, radius));
+    return true;
 };
 
 #endif
