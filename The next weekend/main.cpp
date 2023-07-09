@@ -86,9 +86,8 @@ Hitable *random_scene()
 // random scene
 int main()
 {
-    int aspect_ratio = 16.0 / 9.0;
-    int width = 400;
-    int height = width / aspect_ratio;
+    int width = 1200;
+    int height = 800;
     int ns = 100;
 
     std::ofstream ofs;
@@ -105,7 +104,7 @@ int main()
     Vec3 horizontal = Vec3(4.0, 0.0, 0.0);
     Vec3 vertical = Vec3(0.0, 2.0, 0.0);
     Vec3 position = Vec3(0.0, 0.0, 0.0);
-    float fov = 10.0;
+    float fov = 20.0;
     float aspect = float(width) / float(height);
     Vec3 look_from = Vec3(13.0, 2.0, 3.0);
     Vec3 look_at = Vec3(0.0, 0.0, 0.0);
