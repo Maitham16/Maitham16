@@ -94,7 +94,7 @@ int main()
     Vec3 horizontal = Vec3(4.0, 0.0, 0.0);
     Vec3 vertical = Vec3(0.0, 2.0, 0.0);
     Vec3 position = Vec3(0.0, 0.0, 0.0);
-    float fov = 10.0;
+    float fov = 20.0;
     float aspect = float(width) / float(height);
     Vec3 look_from = Vec3(13.0, 2.0, 3.0);
     Vec3 look_at = Vec3(0.0, 0.0, 0.0);
