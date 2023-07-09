@@ -5,6 +5,7 @@
 #include "Vec3.h"
 #include "Ray.h"
 #include "Hitable.h"
+#include "Texture.h"
 
 class Material
 {
@@ -15,15 +16,16 @@ public:
 class Lambertian : public Material
 {
 public:
-    Vec3 color;
+    Texture *color;
 
-    Lambertian(const Vec3 &color) : color(color) {}
+    Lambertian(const Vec3 &color) : color(new solid_color(color)) {}
+    Lambertian(Texture *color) : color(color) {}
 
     virtual bool scatter(const Ray &ray_in, const Hit_record &hit_record, Vec3 &attenuation, Ray &scattered) const
     {
         Vec3 target = hit_record.p + hit_record.normal + random_in_unit_sphere();
         scattered = Ray(hit_record.p, scattered.direction(), ray_in.time());
-        attenuation = color;
+        attenuation = color->value(hit_record.u, hit_record.v, hit_record.p);
         return true;
     }
 };
@@ -34,7 +36,13 @@ public:
     Vec3 color;
     float fuzz;
 
-    Metal(const Vec3 &color, float fuzz) : color(color) {if (fuzz < 1) this->fuzz = fuzz; else this->fuzz = 1;}
+    Metal(const Vec3 &color, float fuzz) : color(color)
+    {
+        if (fuzz < 1)
+            this->fuzz = fuzz;
+        else
+            this->fuzz = 1;
+    }
 
     virtual bool scatter(const Ray &ray_in, const Hit_record &hit_record, Vec3 &attenuation, Ray &scattered) const
     {
@@ -45,7 +53,7 @@ public:
     }
 };
 
-// schlick approximation for reflectance of dielectric material (glass) at different angles of incidence and refraction indices (air = 1.0) 
+// schlick approximation for reflectance of dielectric material (glass) at different angles of incidence and refraction indices (air = 1.0)
 float schlick(float cosine, float reference_index)
 {
     float r0 = (1 - reference_index) / (1 + reference_index);

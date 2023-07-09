@@ -15,6 +15,7 @@
 #include "Classes/Camera.h"
 #include "Classes/Material.h"
 #include "Classes/Moving_sphere.h"
+#include "Classes/Texture.h"
 
 using namespace std;
 
@@ -47,7 +48,9 @@ Hitable *random_scene()
 {
     int n = 500;
     Hitable **list = new Hitable *[n + 1];
-    list[0] = new Sphere(Vec3(0.0, -1000.0, 0.0), 1000.0, new Lambertian(Vec3(0.5, 0.5, 0.5)));
+    // texture black and white checker board
+    Texture *checker = new checker_texture(new solid_color(Vec3(0.0, 0.0, 0.0)), new solid_color(Vec3(1.0, 1.0, 1.0)));
+    list[0] = new Sphere(Vec3(0.0, -1000.0, 0.0), 1000.0, new Lambertian(checker));
     int i = 1;
     for (int a = -11; a < 11; a++)
     {
@@ -63,7 +66,6 @@ Hitable *random_scene()
                     Vec3 center0 = center;
                     Vec3 center1 = center + Vec3(0.0, 0.5 * drand48(), 0.0);
 
-                    // q: object of abstract class type "Moving_sphere" is not allowed:C/C++(322)? a: you can't create an object of an abstract class. You can only create objects of concrete classes.
                     list[i++] = new Moving_sphere(center0, center1, 0.0, 1.0, 0.2, new Lambertian(Vec3(drand48() * drand48(), drand48() * drand48(), drand48() * drand48())));
                 }
                 else if (choose_material < 0.95)
