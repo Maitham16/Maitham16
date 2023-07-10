@@ -85,6 +85,16 @@ Hitable *random_scene()
     return new Hitable_list(list, i);
 }
 
+Hitable *two_spheres()
+{
+    Texture *checker = new checker_texture(new solid_color(Vec3(0.0, 0.0, 0.0)), new solid_color(Vec3(1.0, 1.0, 1.0)));
+    int n = 50;
+    Hitable **list = new Hitable *[n + 1];
+    list[0] = new Sphere(Vec3(0.0, -10.0, 0.0), 10.0, new Lambertian(checker));
+    list[1] = new Sphere(Vec3(0.0, 10.0, 0.0), 10.0, new Lambertian(checker));
+    return new Hitable_list(list, 2);
+};
+
 // random scene
 int main()
 {
@@ -100,7 +110,7 @@ int main()
         << width << " " << height << "\n255\n";
 
     // scene
-    Hitable *scene = random_scene();
+    Hitable *scene;
 
     Vec3 left = Vec3(-2.0, -1.0, -1.0);
     Vec3 horizontal = Vec3(4.0, 0.0, 0.0);
@@ -113,6 +123,26 @@ int main()
     Vec3 up = Vec3(0.0, 1.0, 0.0);
     float focus = 10.0;
     float aperture = 0.1;
+
+    switch (1)
+    {
+    case 1:
+        scene = random_scene();
+        look_from = Vec3(13.0, 2.0, 3.0);
+        look_at = Vec3(0.0, 0.0, 0.0);
+        fov = 20.0;
+        aperture = 0.1;
+        break;
+
+    default:
+    case 2:
+        scene = two_spheres();
+        look_from = Vec3(13.0, 2.0, 3.0);
+        look_at = Vec3(0.0, 0.0, 0.0);
+        fov = 20.0;
+        break;
+    }
+
     Camera camera(look_from, look_at, up, fov, aspect, aperture, focus, 0.0, 1.0);
 
     // Number of threads
