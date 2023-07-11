@@ -120,6 +120,27 @@ Hitable *simple_light()
     return new Hitable_list(list, 4);
 }
 
+// Cornell Box
+Hitable *cornell_box()
+{
+    Hitable **list = new Hitable *[6];
+    int i = 0;
+    Material *red = new Lambertian(new solid_color(Vec3(0.65, 0.05, 0.05)));
+    Material *white = new Lambertian(new solid_color(Vec3(0.73, 0.73, 0.73)));
+    Material *green = new Lambertian(new solid_color(Vec3(0.12, 0.45, 0.15)));
+    Material *light = new Diffuse_light(new solid_color(Vec3(15, 15, 15)));
+
+    // walls xy, xz, yz
+    list[i++] = new yz_rect(0, 555, 0, 555, 555, green);
+    list[i++] = new yz_rect(0, 555, 0, 555, 0, red);
+    list[i++] = new xz_rect(213, 343, 227, 332, 554, light);
+    list[i++] = new xz_rect(0, 555, 0, 555, 0, white);
+    list[i++] = new xz_rect(0, 555, 0, 555, 555, white);
+    list[i++] = new xy_rect(0, 555, 0, 555, 555, white);
+
+    return new Hitable_list(list, i);
+}
+
 // random scene
 int main()
 {
@@ -151,7 +172,7 @@ int main()
     float focus = 10.0;
     float aperture = 0.1;
 
-    switch (5)
+    switch (6)
     {
     case 1:
         scene = random_scene();
@@ -193,6 +214,15 @@ int main()
         look_from = Vec3(26.0, 3.0, 6.0);
         look_at = Vec3(0.0, 2.0, 0.0);
         fov = 20.0;
+        break;
+
+    case 6:
+        scene = cornell_box();
+        ns = 200;
+        background = Vec3(0.0, 0.0, 0.0);
+        look_from = Vec3(278.0, 278.0, -800.0);
+        look_at = Vec3(278.0, 278.0, 0.0);
+        fov = 40.0;
         break;
     }
 
