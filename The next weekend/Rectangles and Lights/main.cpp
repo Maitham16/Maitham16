@@ -16,32 +16,30 @@
 #include "Classes/Material.h"
 #include "Classes/Moving_sphere.h"
 #include "Classes/Texture.h"
+#include "Classes/aarect.h"
 
 using namespace std;
 
-// return background color
-Vec3 color(const Ray &ray, Hitable *World, int depth)
+// return tracing color
+Vec3 color(const Ray &ray, const Vec3 &background, Hitable *World, int depth)
 {
     Hit_record hit_record;
-    if (World->intersect(ray, 0.001, MAXFLOAT, hit_record))
-    {
-        Ray scattered;
-        Vec3 attenuation;
-        if (depth < 50 && hit_record.material->scatter(ray, hit_record, attenuation, scattered))
-        {
-            return attenuation * color(scattered, World, depth + 1);
-        }
-        else
-        {
-            return Vec3(0.0, 0.0, 0.0);
-        }
-    }
-    else
-    {
-        Vec3 unit_direction = unit_vector(ray.direction());
-        float t = 0.5 * (unit_direction.y() + 1.0);
-        return (1.0 - t) * Vec3(1.0, 1.0, 1.0) + t * Vec3(0.4, 0.5, 1.0);
-    }
+    if (depth <= 0)
+        return Vec3(0.0, 0.0, 0.0);
+
+    if (!World->intersect(ray, 0.001, FLT_MAX, hit_record))
+        return background;
+
+    Ray scattered;
+    Vec3 attenuation;
+    Vec3 emitted = hit_record.material->emitted(hit_record.u, hit_record.v, hit_record.p);
+
+    if (!hit_record.material->scatter(ray, hit_record, attenuation, scattered))
+        return emitted;
+
+    Vec3 unit_direction = unit_vector(ray.direction());
+    float t = 0.5 * (unit_direction.y() + 1.0);
+    return emitted + attenuation * (1.0 - t) + t * color(scattered, background, World, depth - 1);
 }
 
 Hitable *random_scene()
@@ -106,9 +104,20 @@ Hitable *two_perlin_spheres()
 
 Hitable *earth()
 {
-    const char* filename = "./earthmap.jpg"; // assuming earthmap.jpg is in the same directory as the executable
+    const char *filename = "./earthmap.jpg"; // assuming earthmap.jpg is in the same directory as the executable
     Material *mat = new Lambertian(new image_texture(filename));
     return new Sphere(Vec3(0, 0, 0), 2, mat);
+}
+
+Hitable *simple_light()
+{
+    Texture *pertext = new noise_texture(4);
+    Hitable **list = new Hitable *[4];
+    list[0] = new Sphere(Vec3(0, -1000, 0), 1000, new Lambertian(pertext));
+    list[1] = new Sphere(Vec3(0, 2, 0), 2, new Lambertian(pertext));
+    list[2] = new Sphere(Vec3(0, 7, 0), 2, new Diffuse_light(new solid_color(Vec3(4, 4, 4))));
+    list[3] = new xy_rect(3, 5, 1, 3, -2, new Diffuse_light(new solid_color(Vec3(4, 4, 4))));
+    return new Hitable_list(list, 4);
 }
 
 // random scene
@@ -117,6 +126,8 @@ int main()
     int width = 1200;
     int height = 800;
     int ns = 100;
+    int max_depth = 1;
+    Vec3 background(0.0, 0.0, 0.0);
 
     std::ofstream ofs;
     ofs.open("./output.ppm");
@@ -140,10 +151,11 @@ int main()
     float focus = 10.0;
     float aperture = 0.1;
 
-    switch (4)
+    switch (5)
     {
     case 1:
         scene = random_scene();
+        background = Vec3(0.70, 0.80, 1.00);
         look_from = Vec3(13.0, 2.0, 3.0);
         look_at = Vec3(0.0, 0.0, 0.0);
         fov = 20.0;
@@ -152,6 +164,7 @@ int main()
 
     case 2:
         scene = two_spheres();
+        background = Vec3(0.70, 0.80, 1.00);
         look_from = Vec3(13.0, 2.0, 3.0);
         look_at = Vec3(0.0, 0.0, 0.0);
         fov = 20.0;
@@ -159,6 +172,7 @@ int main()
 
     case 3:
         scene = two_perlin_spheres();
+        background = Vec3(0.70, 0.80, 1.00);
         look_from = Vec3(13.0, 2.0, 3.0);
         look_at = Vec3(0.0, 0.0, 0.0);
         fov = 20.0;
@@ -166,8 +180,18 @@ int main()
 
     case 4:
         scene = earth();
+        background = Vec3(0.70, 0.80, 1.00);
         look_from = Vec3(13.0, 2.0, 3.0);
         look_at = Vec3(0.0, 0.0, 0.0);
+        fov = 20.0;
+        break;
+
+    case 5:
+        scene = simple_light();
+        ns = 400;
+        background = Vec3(0.0, 0.0, 0.0);
+        look_from = Vec3(26.0, 3.0, 6.0);
+        look_at = Vec3(0.0, 2.0, 0.0);
         fov = 20.0;
         break;
     }
@@ -203,16 +227,17 @@ int main()
                     float u = float(i + drand48()) / float(width);
                     float v = float(j + drand48()) / float(height);
                     Ray ray = camera.get_ray(u, v);
-                    sceneColor += color(ray, scene, 0);
+                    sceneColor += color(ray, background, scene, max_depth);
                 }
                 sceneColor /= float(ns);
                 sceneColor = Vec3(sqrt(sceneColor.r()), sqrt(sceneColor.g()), sqrt(sceneColor.b()));
 
-                // console output
-                int percent = int(float(j * width + i) / float(width * height) * 100);
-                std::cout << "\r" << percent << "%";
-                std::cout.flush();
+                // console output progress bar (for debugging) % done
+                std::cout << "\r"
+                          << int((float(j - y_start) / float(y_end - y_start)) * 100.0) << "%"
+                          << std::flush;
 
+                // store the color data in the buffer
                 buffer[j][i] = sceneColor;
             }
         } }));
