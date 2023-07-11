@@ -27,7 +27,7 @@ Vec3 color(const Ray &ray, const Vec3 &background, Hitable *World, int depth)
     if (depth <= 0)
         return Vec3(0.0, 0.0, 0.0);
 
-    if (!World->intersect(ray, 0.001, FLT_MAX, hit_record))
+    if (!World->intersect(ray, 0.001, INFINITY, hit_record))
         return background;
 
     Ray scattered;
