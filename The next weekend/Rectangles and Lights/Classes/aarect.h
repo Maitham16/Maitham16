@@ -2,9 +2,9 @@
 #ifndef AARECT_H
 #define AARECT_H
 
-#include "Hitable.h"
+#include "Hittable.h"
 
-class xy_rect : public Hitable
+class xy_rect : public Hittable
 {
 public:
     float x0, x1, y0, y1, k;
@@ -33,13 +33,14 @@ bool xy_rect::intersect(const Ray &ray, float t_min, float t_max, Hit_record &hi
     hit_record.u = (x - x0) / (x1 - x0);
     hit_record.v = (y - y0) / (y1 - y0);
     hit_record.t = t;
+    Vec3 outward_normal = Vec3(0.0, 0.0, 1.0);
+    hit_record.set_face_normal(ray, outward_normal);
     hit_record.material = material;
     hit_record.p = ray.point_at(t);
-    hit_record.normal = Vec3(0.0, 0.0, 1.0);
     return true;
 };
 
-class xz_rect : public Hitable
+class xz_rect : public Hittable
 {
 public:
     float x0, x1, z0, z1, k;
@@ -68,13 +69,14 @@ bool xz_rect::intersect(const Ray &ray, float t_min, float t_max, Hit_record &hi
     hit_record.u = (x - x0) / (x1 - x0);
     hit_record.v = (z - z0) / (z1 - z0);
     hit_record.t = t;
+    Vec3 outward_normal = Vec3(0.0, 1.0, 0.0);
+    hit_record.set_face_normal(ray, outward_normal);
     hit_record.material = material;
     hit_record.p = ray.point_at(t);
-    hit_record.normal = Vec3(0.0, 1.0, 0.0);
     return true;
 };
 
-class yz_rect : public Hitable
+class yz_rect : public Hittable
 {
 public:
     float y0, y1, z0, z1, k;
@@ -103,9 +105,11 @@ bool yz_rect::intersect(const Ray &ray, float t_min, float t_max, Hit_record &hi
     hit_record.u = (y - y0) / (y1 - y0);
     hit_record.v = (z - z0) / (z1 - z0);
     hit_record.t = t;
+    Vec3 outward_normal = Vec3(1.0, 0.0, 0.0);
+    hit_record.set_face_normal(ray, outward_normal);
     hit_record.material = material;
     hit_record.p = ray.point_at(t);
-    hit_record.normal = Vec3(1.0, 0.0, 0.0);
     return true;
 };
+
 #endif

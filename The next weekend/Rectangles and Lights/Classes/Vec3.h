@@ -1,6 +1,6 @@
 // Vector3 header class (according to the book Ray Tracing in One Weekend)
-#ifndef VEC3_H
-#define VEC3_H
+#ifndef Vec3_H
+#define Vec3_H
 
 #include <cmath>
 #include <iostream>
@@ -215,6 +215,14 @@ inline bool refract(const Vec3 &v, const Vec3 &n, float ni_over_nt, Vec3 &refrac
     }
 }
 
+inline Vec3 refract(const Vec3& uv, const Vec3& n, double etai_over_etat) 
+{
+    auto cos_theta = fmin(dot(-uv, n), 1.0);
+    Vec3 r_out_perp =  etai_over_etat * (uv + cos_theta*n);
+    Vec3 r_out_parallel = -sqrt(fabs(1.0 - r_out_perp.squared_length())) * n;
+    return r_out_perp + r_out_parallel;
+}
+
 inline Vec3 random_in_unit_disk()
 {
     Vec3 p;
@@ -254,5 +262,24 @@ inline double clamp(double x, double min, double max)
     return x;
 }
 
+// double += Vec3
+inline void operator+=(double &x, const Vec3 &v)
+{
+    x += v.x();
+}
+
+// near_zero
+inline bool near_zero(const Vec3 &v)
+{
+    // Return true if the vector is close to zero in all dimensions.
+    const auto s = 1e-8;
+    return (fabs(v.x()) < s) && (fabs(v.y()) < s) && (fabs(v.z()) < s);
+}
+
+// random_unit_vector
+inline Vec3 random_unit_vector()
+{
+    return unit_vector(random_in_unit_sphere());
+}
 
 #endif

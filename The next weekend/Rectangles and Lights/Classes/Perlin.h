@@ -42,12 +42,10 @@ public:
         for (int di = 0; di < 2; di++)
             for (int dj = 0; dj < 2; dj++)
                 for (int dk = 0; dk < 2; dk++)
-                    c[di][dj][dk] = random_vec[
-                        perm_x[(i + di) & 255] ^
-                        perm_y[(j + dj) & 255] ^
-                        perm_z[(k + dk) & 255]];
+                    c[di][dj][dk] = random_vec[perm_x[(i + di) & 255] ^ 
+                    perm_y[(j + dj) & 255] ^ perm_z[(k + dk) & 255]];
 
-        return trilinear_interp(c, u, v, w);
+        return perlin_interp(c, u, v, w);
     }
 
     double turb(const Vec3 &p, int depth = 7) const
@@ -98,10 +96,24 @@ private:
 
     static double trilinear_interp(Vec3 c[2][2][2], double u, double v, double w)
     {
+        double accum = 0.0;
+
+        for (int i = 0; i < 2; i++)
+            for (int j = 0; j < 2; j++)
+                for (int k = 0; k < 2; k++)
+                    accum += (i * u + (1 - i) * (1 - u)) *
+                             (j * v + (1 - j) * (1 - v)) *
+                             (k * w + (1 - k) * (1 - w)) * c[i][j][k];
+
+        return accum;
+    }
+
+    static double perlin_interp(Vec3 c[2][2][2], double u, double v, double w)
+    {
         double uu = u * u * (3 - 2 * u);
         double vv = v * v * (3 - 2 * v);
         double ww = w * w * (3 - 2 * w);
-        double accum = 0;
+        double accum = 0.0;
 
         for (int i = 0; i < 2; i++)
             for (int j = 0; j < 2; j++)
@@ -110,8 +122,7 @@ private:
                     Vec3 weight_v(u - i, v - j, w - k);
                     accum += (i * uu + (1 - i) * (1 - uu)) *
                              (j * vv + (1 - j) * (1 - vv)) *
-                             (k * ww + (1 - k) * (1 - ww)) *
-                             dot(c[i][j][k], weight_v);
+                             (k * ww + (1 - k) * (1 - ww)) * dot(c[i][j][k], weight_v);
                 }
 
         return accum;

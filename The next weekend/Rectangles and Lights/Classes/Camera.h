@@ -29,7 +29,7 @@ public:
     double time0, time1;
 
     // constructor
-    Camera(Vec3 look_from, Vec3 look_at, Vec3 up, float fov, float aspect, float aperture, float focus, double _time0 = 0, double _time1 = 0)
+    Camera(Vec3 look_from, Vec3 look_at, Vec3 up, float fov, float aspect, float aperture, float focus, double time0 = 0, double time1 = 0)
     {
         float theta = fov * M_PI / 180.0;
         float height = 2.0 * tan(theta / 2.0);
@@ -42,8 +42,8 @@ public:
         vertical = height * focus * v;
         left = position - horizontal / 2.0 - vertical / 2.0 - focus * w;
         lens_radius = aperture / 2.0;
-        time0 = _time0;
-        time1 = _time1;
+        time0 = time0;
+        time1 = time1;
     }
 
     // rf. youtube channel Avery Makes Games

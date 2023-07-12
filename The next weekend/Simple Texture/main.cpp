@@ -124,7 +124,7 @@ int main()
     float focus = 10.0;
     float aperture = 0.1;
 
-    switch (1)
+    switch (2)
     {
     case 1:
         scene = random_scene();
