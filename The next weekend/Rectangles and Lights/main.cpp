@@ -18,6 +18,8 @@
 #include "Classes/Texture.h"
 #include "Classes/aarect.h"
 #include "Classes/Box.h"
+#include "Classes/Translate.h"
+#include "Classes/Rotate.h"
 
 using namespace std;
 
@@ -140,9 +142,15 @@ Hittable *cornell_box()
     list[4] = new xz_rect(0, 555, 0, 555, 555, white);
     list[5] = new xy_rect(0, 555, 0, 555, 555, white);
 
-    // boxes non moving
-    list[6] = new box(Vec3(130, 0, 65), Vec3(295, 165, 230), white);
-    list[7] = new box(Vec3(265, 0, 295), Vec3(430, 330, 460), white);
+    // boxes
+    Hittable *box1 = new box(Vec3(0, 0, 0), Vec3(165, 330, 165), white);
+    box1 = new Rotate_y(box1, 15);
+    box1 = new Translate(box1, Vec3(265, 0, 295));
+    list[6] = box1;
+    Hittable *box2 = new box(Vec3(0, 0, 0), Vec3(165, 165, 165), white);
+    box2 = new Rotate_y(box2, -18);
+    box2 = new Translate(box2, Vec3(130, 0, 65));
+    list[7] = box2;
 
     return new Hittable_list(list, 8);
 }
