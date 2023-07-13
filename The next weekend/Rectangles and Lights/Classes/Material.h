@@ -121,4 +121,20 @@ public:
     }
 };
 
+class Isotropic : public Material
+{
+public:
+    Texture *color;
+
+    Isotropic(Texture *color) : color(color) {}
+    Isotropic(Vec3 albedo) : color(new solid_color(albedo)) {}
+
+    virtual bool scatter(const Ray &ray_in, const Hit_record &hit_record, Vec3 &attenuation, Ray &scattered) const
+    {
+        scattered = Ray(hit_record.p, random_in_unit_sphere(), ray_in.time());
+        attenuation = color->value(hit_record.u, hit_record.v, hit_record.p);
+        return true;
+    }
+};
+
 #endif

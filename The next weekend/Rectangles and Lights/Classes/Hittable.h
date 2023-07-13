@@ -17,6 +17,7 @@ struct Hit_record
     double u;
     double v;
     bool front_face;
+    
     // set_face_normal function
     inline void set_face_normal(const Ray &r, const Vec3 &outward_normal)
     {
