@@ -65,7 +65,7 @@ Hittable *random_scene()
             {
                 if (choose_material < 0.8)
                 { // diffuse
-                    // moving Sphere
+                    // moving sphere
                     Vec3 center0 = center;
                     Vec3 center1 = center + Vec3(0.0, 0.5 * drand48(), 0.0);
 
@@ -88,7 +88,7 @@ Hittable *random_scene()
     return new Hittable_list(list, i);
 }
 
-Hittable *two_Spheres()
+Hittable *two_spheres()
 {
     Texture *checker = new checker_texture(new solid_color(Vec3(0.2, 0.3, 0.1)), new solid_color(Vec3(0.9, 0.9, 0.9)));
     int n = 50;
@@ -99,7 +99,7 @@ Hittable *two_Spheres()
     return new Hittable_list(list, 2);
 };
 
-Hittable *two_perlin_Spheres()
+Hittable *two_perlin_spheres()
 {
     Texture *pertext = new noise_texture(4);
     Hittable **list = new Hittable *[2];
@@ -203,7 +203,7 @@ int main()
     int width = 1200;
     int height = 800;
     int ns = 100;
-    int max_depth = 0;
+    int max_depth = 50;
     Vec3 background(0.0, 0.0, 0.0);
 
     std::ofstream ofs;
@@ -228,7 +228,7 @@ int main()
     float focus = 10.0;
     float aperture = 0.1;
 
-    switch (6)
+    switch (case_num)
     {
     case 1:
         scene = random_scene();
@@ -240,7 +240,7 @@ int main()
         break;
 
     case 2:
-        scene = two_Spheres();
+        scene = two_spheres();
         background = Vec3(0.70, 0.80, 1.00);
         look_from = Vec3(13.0, 2.0, 3.0);
         look_at = Vec3(0.0, 0.0, 0.0);
@@ -248,7 +248,7 @@ int main()
         break;
 
     case 3:
-        scene = two_perlin_Spheres();
+        scene = two_perlin_spheres();
         background = Vec3(0.70, 0.80, 1.00);
         look_from = Vec3(13.0, 2.0, 3.0);
         look_at = Vec3(0.0, 0.0, 0.0);
@@ -288,32 +288,20 @@ int main()
         break;
     }
 
-// console output
-std::cout << "\ncreate camera\n";
     Camera camera(look_from, look_at, up, fov, aspect, aperture, focus, 0.0, 1.0);
 
     // Number of threads
-    // console output
-std::cout << "\ncreate threads\n";
     const int num_threads = std::thread::hardware_concurrency();
 
-// console output
-std::cout << "\ncreate buffer\n";
     // Calculate the height of each chunk
     int chunk_height = height / num_threads;
 
-// console output
-std::cout << "\ncreate threads\n";
     // Create a vector to hold the threads
     std::vector<std::thread> threads;
 
-// console output
-std::cout << "\ncreate buffer\n";
     // Create a buffer to store the color data
     std::vector<std::vector<Vec3>> buffer(height, std::vector<Vec3>(width));
 
-// console output
-std::cout << "\ncreate and launch threads\n";
     // Create and launch the threads
     for (int t = 0; t < num_threads; ++t)
     {
@@ -323,17 +311,11 @@ std::cout << "\ncreate and launch threads\n";
         int y_start = t * chunk_height;
         int y_end = (t == num_threads - 1) ? height : y_start + chunk_height;
 
-// console output
-std::cout << "\nrender chunk " << t << "\n";
         // Render this chunk
         for (int j = y_start; j < y_end; ++j) {
             for (int i = 0; i < width; ++i) {
                 Vec3 sceneColor(0.0, 0.0, 0.0);
                 for (int s = 0; s < ns; s++) {
-                    // console output
-                    std::cout << "\r"
-                              << int((float(s) / float(ns)) * 100.0) << "%"
-                              << std::flush;
                     float u = float(i + drand48()) / float(width);
                     float v = float(j + drand48()) / float(height);
                     Ray ray = camera.get_ray(u, v);

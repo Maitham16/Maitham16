@@ -3,9 +3,14 @@
 #define BVHNODE_H
 
 #include <algorithm>
+#include <iostream>
+#include <memory>
+#include <vector>
 
+#include "AABB.h"
 #include "Hittable.h"
 #include "Hittable_list.h"
+#include "Ray.h"
 
 class BVH_node : public Hittable
 {
@@ -19,17 +24,7 @@ public:
 
     BVH_node(const std::vector<Hittable *> &src_objects, size_t start, size_t end, double time0, double time1);
 
-    virtual bool intersect(const Ray &ray, float t_min, float t_max, Hit_record &rec) const override;
-
-    virtual bool bounding_box(float time0, float time1, AABB &output_box) const override;
-
-public:
-    Hittable *left;
-    Hittable *right;
-    AABB box;
-};
-
-    bool BVH_node::intersect(const Ray &ray, float t_min, float t_max, Hit_record &rec) const
+    bool intersect(const Ray &ray, float t_min, float t_max, Hit_record &rec) const override
     {
         if (!box.intersect(ray, t_min, t_max))
             return false;
@@ -40,11 +35,17 @@ public:
         return hit_left || hit_right;
     }
 
-    bool BVH_node::bounding_box(float time0, float time1, AABB &output_box) const
+    bool bounding_box(float time0, float time1, AABB &output_box) const override
     {
         output_box = box;
         return true;
     }
+
+public:
+    Hittable *left;
+    Hittable *right;
+    AABB box;
+};
 
 inline bool box_compare(const Hittable *a, const Hittable *b, int axis)
 {
@@ -74,6 +75,8 @@ bool box_z_compare(const Hittable *a, const Hittable *b)
 
 BVH_node::BVH_node(const std::vector<Hittable *> &src_objects, size_t start, size_t end, double time0, double time1)
 {
+    std::vector<Hittable *> objects(src_objects.begin() + start, src_objects.begin() + end);
+
     int axis = random_int(0, 2);
     auto comparator = (axis == 0)   ? box_x_compare
                       : (axis == 1) ? box_y_compare
@@ -83,29 +86,28 @@ BVH_node::BVH_node(const std::vector<Hittable *> &src_objects, size_t start, siz
 
     if (object_span == 1)
     {
-        left = right = src_objects[start];
+        left = right = objects[start];
     }
     else if (object_span == 2)
     {
-        if (comparator(src_objects[start], src_objects[start + 1]))
+        if (comparator(objects[start], objects[start + 1]))
         {
-            left = src_objects[start];
-            right = src_objects[start + 1];
+            left = objects[start];
+            right = objects[start + 1];
         }
         else
         {
-            left = src_objects[start + 1];
-            right = src_objects[start];
+            left = objects[start + 1];
+            right = objects[start];
         }
     }
     else
     {
-        std::vector<Hittable *> objects = src_objects;                         // copy the entire src_objects
-        std::sort(objects.begin() + start, objects.begin() + end, comparator); // only sort the relevant part
+        std::sort(objects.begin(), objects.end(), comparator);
 
         auto mid = start + object_span / 2;
-        left = new BVH_node(objects, start, mid, time0, time1);
-        right = new BVH_node(objects, mid, end, time0, time1);
+        left = new BVH_node(objects, 0, mid - start, time0, time1);
+        right = new BVH_node(objects, mid - start, end - start, time0, time1);
     }
 
     AABB box_left, box_right;
@@ -115,6 +117,6 @@ BVH_node::BVH_node(const std::vector<Hittable *> &src_objects, size_t start, siz
         std::cerr << "No bounding box in BVH_node constructor.\n";
 
     box = surrounding_box(box_left, box_right);
-}
+};
 
 #endif
