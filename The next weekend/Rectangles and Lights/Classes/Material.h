@@ -122,8 +122,8 @@ public:
 };
 
 class Isotropic : public Material
-{
-public:
+{   
+    public:
     Texture *color;
 
     Isotropic(Texture *color) : color(color) {}

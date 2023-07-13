@@ -21,7 +21,6 @@
 #include "Classes/Translate.h"
 #include "Classes/Rotate.h"
 #include "Classes/constant_medium.h"
-#include "Classes/BVHNode.h"
 
 using namespace std;
 
@@ -66,7 +65,7 @@ Hittable *random_scene()
             {
                 if (choose_material < 0.8)
                 { // diffuse
-                    // moving Sphere
+                    // moving sphere
                     Vec3 center0 = center;
                     Vec3 center1 = center + Vec3(0.0, 0.5 * drand48(), 0.0);
 
@@ -89,7 +88,7 @@ Hittable *random_scene()
     return new Hittable_list(list, i);
 }
 
-Hittable *two_Spheres()
+Hittable *two_spheres()
 {
     Texture *checker = new checker_texture(new solid_color(Vec3(0.2, 0.3, 0.1)), new solid_color(Vec3(0.9, 0.9, 0.9)));
     int n = 50;
@@ -100,7 +99,7 @@ Hittable *two_Spheres()
     return new Hittable_list(list, 2);
 };
 
-Hittable *two_perlin_Spheres()
+Hittable *two_perlin_spheres()
 {
     Texture *pertext = new noise_texture(4);
     Hittable **list = new Hittable *[2];
@@ -157,7 +156,6 @@ Hittable *cornell_box()
     return new Hittable_list(list, 8);
 }
 
-// Cornell Box with smoke
 Hittable *cornell_smoke()
 {
     Hittable **list = new Hittable *[8];
@@ -187,86 +185,25 @@ Hittable *cornell_smoke()
     return new Hittable_list(list, 8);
 }
 
-// final scene end of the book 2
-Hittable *final_scene()
-{
-    // console output
-    std::cerr << "\nRendering the final scene...\n";
-    Hittable_list *boxes1 = new Hittable_list();
-    Material *ground = new Lambertian(new solid_color(Vec3(0.48, 0.83, 0.53)));
-
-    int boxes_per_side = 20;
-
-    for (int i = 0; i < boxes_per_side; i++)
-    {
-        for (int j = 0; j < boxes_per_side; j++)
-        {
-            double w = 100.0;
-            double x0 = -1000.0 + i * w;
-            double z0 = -1000.0 + j * w;
-            double y0 = 0.0;
-            double x1 = x0 + w;
-            double y1 = random_double(1, 101);
-            double z1 = z0 + w;
-
-            boxes1->add(new box(Vec3(x0, y0, z0), Vec3(x1, y1, z1), ground));
-        }
-    }
-
-// console output
-std::cout << "\ncreate hittable list\n";
-    Hittable **list = new Hittable *[30];
-    int i = 0;
-    list[i++] = new BVH_node(*boxes1, 0, 1);
-
-    Material *light = new Diffuse_light(new solid_color(Vec3(7, 7, 7)));
-    list[i++] = new xz_rect(123, 423, 147, 412, 554, light);
-
-    Vec3 center1 = Vec3(400, 400, 200);
-    Vec3 center2 = center1 + Vec3(30, 0, 0);
-    Material *Moving_sphere_material = new Lambertian(new solid_color(Vec3(0.7, 0.3, 0.1)));
-    list[i++] = new Moving_sphere(center1, center2, 0, 1, 50, Moving_sphere_material);
-
-    list[i++] = new Sphere(Vec3(260, 150, 45), 50, new dielectric(1.5));
-    list[i++] = new Sphere(Vec3(0, 150, 145), 50, new Metal(Vec3(0.8, 0.8, 0.9), 10.0));
-
-    Hittable *boundary = new Sphere(Vec3(360, 150, 145), 70, new dielectric(1.5));
-    list[i++] = boundary;
-    list[i++] = new constant_medium(boundary, 0.2, new solid_color(Vec3(0.2, 0.4, 0.9)));
-    boundary = new Sphere(Vec3(0, 0, 0), 5000, new dielectric(1.5));
-    list[i++] = new constant_medium(boundary, 0.0001, new solid_color(Vec3(1, 1, 1)));
-
-    auto emat = new Lambertian(new image_texture("earthmap.jpg"));
-    list[i++] = new Sphere(Vec3(400, 200, 400), 100, emat);
-    auto pertext = new noise_texture(0.1);
-    list[i++] = new Sphere(Vec3(220, 280, 300), 80, new Lambertian(pertext));
-
-// console output
-std::cout << "\ncreate hittable boxes\n";
-    Hittable_list *boxes2 = new Hittable_list();
-    Material *white = new Lambertian(new solid_color(Vec3(0.73, 0.73, 0.73)));
-    int ns = 1000;
-    for (int j = 0; j < ns; j++)
-    {
-        boxes2->add(new Sphere(random_vec3(0, 165), 10, white));
-    }
-
-// console output
-std::cout << "\ncreate hittable translation level\n";
-    list[i++] = new Translate(new Rotate_y(new BVH_node(*boxes2, 0.0, 1.0), 15), Vec3(-100, 270, 395));
-
-// console output
-std::cout << "\ncfinish hittable list\n";
-    return new Hittable_list(list, i);
-}
-
 // random scene
 int main()
 {
+    // Get user input
+    int case_num;
+    std::cout << "Enter a case number from 1 to 8: ";
+    std::cin >> case_num;
+
+    // Validate user input
+    if (case_num < 1 || case_num > 8)
+    {
+        std::cerr << "Invalid case number. Please enter a number from 1 to 8.";
+        return -1; // or other appropriate error handling
+    }
+
     int width = 1200;
     int height = 800;
     int ns = 100;
-    int max_depth = 0;
+    int max_depth = 50;
     Vec3 background(0.0, 0.0, 0.0);
 
     std::ofstream ofs;
@@ -291,7 +228,7 @@ int main()
     float focus = 10.0;
     float aperture = 0.1;
 
-    switch (8)
+    switch (case_num)
     {
     case 1:
         scene = random_scene();
@@ -303,7 +240,7 @@ int main()
         break;
 
     case 2:
-        scene = two_Spheres();
+        scene = two_spheres();
         background = Vec3(0.70, 0.80, 1.00);
         look_from = Vec3(13.0, 2.0, 3.0);
         look_at = Vec3(0.0, 0.0, 0.0);
@@ -311,7 +248,7 @@ int main()
         break;
 
     case 3:
-        scene = two_perlin_Spheres();
+        scene = two_perlin_spheres();
         background = Vec3(0.70, 0.80, 1.00);
         look_from = Vec3(13.0, 2.0, 3.0);
         look_at = Vec3(0.0, 0.0, 0.0);
@@ -349,42 +286,22 @@ int main()
         look_at = Vec3(278.0, 278.0, 0.0);
         fov = 40.0;
         break;
-
-    case 8:
-        scene = final_scene();
-        ns = 10000;
-        look_from = Vec3(478.0, 278.0, -600.0);
-        look_at = Vec3(278.0, 278.0, 0.0);
-        fov = 40.0;
-        break;
     }
 
-// console output
-std::cout << "\ncreate camera\n";
     Camera camera(look_from, look_at, up, fov, aspect, aperture, focus, 0.0, 1.0);
 
     // Number of threads
-    // console output
-std::cout << "\ncreate threads\n";
     const int num_threads = std::thread::hardware_concurrency();
 
-// console output
-std::cout << "\ncreate buffer\n";
     // Calculate the height of each chunk
     int chunk_height = height / num_threads;
 
-// console output
-std::cout << "\ncreate threads\n";
     // Create a vector to hold the threads
     std::vector<std::thread> threads;
 
-// console output
-std::cout << "\ncreate buffer\n";
     // Create a buffer to store the color data
     std::vector<std::vector<Vec3>> buffer(height, std::vector<Vec3>(width));
 
-// console output
-std::cout << "\ncreate and launch threads\n";
     // Create and launch the threads
     for (int t = 0; t < num_threads; ++t)
     {
@@ -394,17 +311,11 @@ std::cout << "\ncreate and launch threads\n";
         int y_start = t * chunk_height;
         int y_end = (t == num_threads - 1) ? height : y_start + chunk_height;
 
-// console output
-std::cout << "\nrender chunk " << t << "\n";
         // Render this chunk
         for (int j = y_start; j < y_end; ++j) {
             for (int i = 0; i < width; ++i) {
                 Vec3 sceneColor(0.0, 0.0, 0.0);
                 for (int s = 0; s < ns; s++) {
-                    // console output
-                    std::cout << "\r"
-                              << int((float(s) / float(ns)) * 100.0) << "%"
-                              << std::flush;
                     float u = float(i + drand48()) / float(width);
                     float v = float(j + drand48()) / float(height);
                     Ray ray = camera.get_ray(u, v);
