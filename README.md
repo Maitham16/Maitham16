@@ -1,6 +1,6 @@
 - 🖐️ Hi, I’m Maitham Alrubaye.
 - 🎓 I hold a BSc in Computer Engineering and am currently pursuing an MSc in Computer Science.
-- 💡 Inspired by my favorite master's classes and the books "Ray Tracing in One Weekend", "Ray Tracing: The Next Weekend", and "Ray Tracing: The Rest Of Your Life", I embarked on a project focused on Ray Tracing using C++. It's important to note that while all the classes align with the referenced books in terms of functionality, I adapted them to my unique programming style. (Also, a copy from author's code is attached along with this project).
+- 💡 Inspired by my favorite master's classes and the books "Ray Tracing in One Weekend", "Ray Tracing: The Next Weekend", and "Ray Tracing: The Rest Of Your Life", I embarked on a project focused on Ray Tracing using C++. It's important to note that while all the classes align with the referenced books in terms of functionality, I adapted them to my unique programming style. (Also, a copy of the author's code is attached along with this project).
 - 💖 For me, programming is as compelling as a love interest.
 - 🚀 Copilot is my trusted sidekick in coding.
 - 📝 The references mentioned in the comments are either from the aforementioned book or from the YouTube channel, Avery Makes Games.
