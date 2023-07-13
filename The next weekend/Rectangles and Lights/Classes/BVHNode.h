@@ -10,7 +10,6 @@
 #include "AABB.h"
 #include "Hittable.h"
 #include "Hittable_list.h"
-#include "Ray.h"
 
 class BVH_node : public Hittable
 {
